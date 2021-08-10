@@ -1,0 +1,100 @@
+
+\documentclass[12pt]{article}
+\usepackage{times}
+\usepackage{babel}
+\usepackage{titling}
+\usepackage{blindtext}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{natbib,etoolbox,lipsum,hyperref}
+
+
+\usepackage[%
+    left=2cm,%
+    right=2cm,%
+    top=3cm,%
+    bottom=3cm,%
+    paperheight=29.7cm,%
+    paperwidth=21cm%
+]{geometry} % Page settings
+
+\begin{document}
+\begin{titlepage}
+
+
+\setlength{\droptitle}{-4em} 
+\center
+
+{\huge \bfseries CS6023 GPU Course Project} % Title of the project
+\\[2cm] 
+
+
+\begin{minipage}{0.4\textwidth}
+\begin{center} \large
+Submitted by: \textbf{N K Sagar Reddy , P Bharat Simha Reddy} % Name of the student
+\\[0.5cm]
+Roll no: \textbf{CS18B029, CS18B051} % Registration number of the student
+\end{center}
+\end{minipage} 
+
+%\addtolength{\droptitle}{-4pt}
+\vspace{12em}
+
+\includegraphics[width=8cm]{logo.png}
+
+\vspace{12em}
+\begin{minipage}{0.5\textwidth}
+\begin{center} \large
+\textbf{Department of Computer science and Engineering} % Name of the department
+\\[0.5cm]
+
+\end{center}
+\end{minipage} 
+
+\vspace{5em}
+{\large \today}
+
+
+\end{titlepage}
+
+\section{Idea}
+\begin{itemize}
+    \item We would like to find the shortest path between any 2 given nodes in a dynamically changing grid in an efficient manner.
+    \item The idea is to parallelize the algorithm used(Dynamic A*) and also change the computed data instead of recomputing it from the start everytime the grid changes.
+    \item This algorithm is mainly useful in the gaming industry where the environment changes continuously and when we need to find the optimal path to the destination.
+\end{itemize}
+
+\section{Project info}
+\begin{itemize}
+    \item We have parallelized sequential Dynamic A* pathfinding algorithm in CUDA.
+    \item Key Concepts used: Implementation of Priority Queue using linked list on a GPU , Dynamic Parallelism .
+    \item We have an input grid,where -1s represent blockages , other non negative values represent the cost added to the path which passes through that particular location.
+    \item We also dynamically add edges/values to this grid (as given in the input file) in between 2 shortest path computations.
+    \item There are 2 types of queries given in the input file : Compute(id = 7) and Add(id = 3).
+    \item For each Compute Query ,we find the shortest path from the already given source and destination at that point of time and print it.
+    \item For each Add query,we add one or more edges to the given grid with their values/costs as mentioned in the input file.
+\end{itemize}
+
+\section{Input Format}
+\begin{itemize}
+    \item The first line contains n and m(representing the number of rows and columns in the grid)
+    \item The next n lines contain m integers each,which represent the Grid.
+    \item Below the grid, the next line contains 4 integers: srcx,srcy,destx,desty , which represent the locations of the source and destination in the given grid.
+    \item The next line contains Q which is the number of queries. Q queries follow.
+    \item \textbf{Query Type - 1:} The query format is "7". we have to compute and print the shortest path upon scanning this query.
+    \item \textbf{Query Type - 2:} The query format is "3 e",e lines follow.(e edges to be added)
+    \item Each of the edge to be added is of the "x y val" format,which says to update the grid[x][y] to the value "val".
+\end{itemize}
+
+\section{Challenges Faced}
+\begin{itemize}
+    \item We implemented A* first,then we implemented Dynamic A* without recomputing some key data and just making required modifications after each edge addition.
+    So we had to write a function/kernel for each edge addition,which takes care of certain implementation aspects such as setting the parent of the given location and updating the grid after the change has been made. 
+    \item To increase the efficiency, we have used the concept of Dynamic parallelisation,which ensures kernel within kernel calls.
+    This helped us to maintain a priority queue inside the GPU,\\
+    we had to implement the priority queue using linked list based functions which were accessible to the kernel(device functions) as the kernel cant call global functions.
+\end{itemize}
+
+
+\end{document}
